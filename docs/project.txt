@@ -1,0 +1,11 @@
+RideX Project
+Version: MVP
+Country: Jordan
+
+Services:
+- Passenger rides
+- Captain service
+- Orders delivery
+
+Goal:
+Build first working MVP

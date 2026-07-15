@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+<title>RideX Passenger</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#0066cc;
+text-align:center;
+padding:30px;
+}
+
+.card{
+background:white;
+border-radius:20px;
+padding:30px;
+}
+
+.info{
+background:#eee;
+padding:20px;
+margin:15px;
+border-radius:15px;
+font-size:22px;
+}
+
+h1{
+color:#0066cc;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<div class="card">
+
+
+<h1>🚗 RideX</h1>
+
+
+<h2 id="status">
+🚗 الكابتن في الطريق إليك
+</h2>
+
+
+<div class="info">
+👤 الكابتن:
+<br>
+<span id="name">-</span>
+</div>
+
+
+<div class="info">
+🚘 السيارة:
+<br>
+<span id="car">-</span>
+</div>
+
+
+<div class="info">
+🔢 اللوحة:
+<br>
+<span id="plate">-</span>
+</div>
+
+
+<div class="info">
+📞 الهاتف:
+<br>
+<span id="phone">-</span>
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+function checkRide(){
+
+
+fetch("http://127.0.0.1:9000/ride")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+
+let c=data.captain || {};
+
+
+document.getElementById("name").innerHTML =
+c.name || "-";
+
+
+document.getElementById("car").innerHTML =
+c.car || "-";
+
+
+document.getElementById("plate").innerHTML =
+c.plate || "-";
+
+
+document.getElementById("phone").innerHTML =
+c.phone || "-";
+
+
+
+let status=document.getElementById("status");
+
+
+if(data.status==="accepted"){
+
+status.innerHTML=
+"🚗 الكابتن في الطريق إليك";
+
+}
+
+
+else if(data.status==="started"){
+
+status.innerHTML=
+"🛣️ الرحلة بدأت";
+
+}
+
+
+else if(data.status==="finished"){
+
+status.innerHTML=
+"✅ وصلت إلى وجهتك";
+
+}
+
+
+
+});
+
+
+}
+
+
+setInterval(checkRide,1000);
+
+checkRide();
+
+
+</script>
+
+
+</body>
+
+</html>

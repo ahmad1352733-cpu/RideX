@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+<meta charset="UTF-8">
+<title>RideX</title>
+
+<style>
+
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0066cc;
+    color: white;
+    text-align: center;
+}
+
+.container {
+    padding: 40px 20px;
+}
+
+.logo {
+    font-size: 45px;
+    font-weight: bold;
+}
+
+.card {
+    background: white;
+    color: #333;
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 40px;
+}
+
+h2 {
+    font-size: 32px;
+}
+
+p {
+    font-size: 22px;
+}
+
+button {
+    width: 90%;
+    padding: 20px;
+    margin-top: 25px;
+    font-size: 25px;
+    border-radius: 15px;
+    border: none;
+    background: #0066cc;
+    color: white;
+}
+
+a {
+    text-decoration: none;
+}
+
+.register {
+    display: block;
+    margin-top: 25px;
+    color: white;
+    font-size: 22px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">
+🚗 RideX
+</div>
+
+<div class="card">
+
+<h2>توصيل ركاب</h2>
+
+<p>
+اطلب كابتن الآن للوصول إلى وجهتك
+</p>
+
+<a href="ride.html">
+<button>
+اطلب كابتن
+</button>
+</a>
+
+</div>
+
+<a class="register" href="register.html">
+تسجيل جديد
+</a>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+<title>RideX Captain</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#0066cc;
+text-align:center;
+padding:30px;
+}
+
+.card{
+background:white;
+border-radius:20px;
+padding:30px;
+}
+
+.info{
+background:#eee;
+padding:20px;
+border-radius:15px;
+font-size:22px;
+margin:15px;
+}
+
+button{
+width:90%;
+padding:18px;
+font-size:24px;
+border:none;
+border-radius:15px;
+background:#0066cc;
+color:white;
+margin:10px;
+}
+
+#map{
+height:350px;
+border-radius:20px;
+margin:20px 0;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+<h1>🚗 RideX Captain</h1>
+
+
+<div id="map"></div>
+
+
+
+<div class="info">
+📍 الانطلاق:
+<br>
+<span id="from">-</span>
+</div>
+
+
+<div class="info">
+🏁 الوجهة:
+<br>
+<span id="to">-</span>
+</div>
+
+
+
+<button onclick="acceptRide()">
+✅ قبول الرحلة
+</button>
+
+
+<button onclick="startRide()">
+🚗 بدء الرحلة
+</button>
+
+
+<button onclick="finishRide()">
+🏁 إنهاء الرحلة
+</button>
+
+
+<h3 id="msg"></h3>
+
+
+</div>
+
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+<script>
+
+
+let map = L.map('map').setView(
+[31.9539,35.9106],
+13
+);
+
+
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+maxZoom:19
+}
+).addTo(map);
+
+
+
+let passengerMarker;
+
+let captainMarker;
+
+
+
+
+function getRide(){
+
+
+fetch("http://127.0.0.1:9000/ride")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+
+document.getElementById("from").innerHTML =
+data.from || "-";
+
+
+document.getElementById("to").innerHTML =
+data.to || "-";
+
+
+});
+
+}
+
+
+
+
+
+function getPassengerLocation(){
+
+
+fetch("http://127.0.0.1:9000/ride")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+
+let p=data.passenger_location;
+
+
+if(p && p.lat != 0){
+
+
+if(passengerMarker){
+
+
+passengerMarker.setLatLng(
+[p.lat,p.lng]
+);
+
+
+}else{
+
+
+passengerMarker=L.marker(
+[p.lat,p.lng]
+)
+.addTo(map)
+.bindPopup("📍 موقع الراكب");
+
+
+}
+
+
+}
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+function sendCaptainLocation(){
+
+
+navigator.geolocation.getCurrentPosition(
+
+function(position){
+
+
+let lat=position.coords.latitude;
+
+let lng=position.coords.longitude;
+
+
+
+fetch("http://127.0.0.1:9000/captain_location",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+lat:lat,
+
+lng:lng
+
+})
+
+});
+
+
+
+
+if(captainMarker){
+
+
+captainMarker.setLatLng(
+[lat,lng]
+);
+
+
+}else{
+
+
+captainMarker=L.marker(
+[lat,lng]
+)
+.addTo(map)
+.bindPopup("🚗 موقع الكابتن");
+
+
+}
+
+
+
+}
+
+);
+
+
+}
+
+
+
+
+
+
+function acceptRide(){
+
+
+let captain={
+
+
+name:localStorage.getItem("captainName") || "كابتن",
+
+
+car:localStorage.getItem("captainCar") || "-",
+
+
+plate:localStorage.getItem("captainPlate") || "-",
+
+
+phone:localStorage.getItem("captainPhone") || "-"
+
+
+};
+
+
+
+fetch("http://127.0.0.1:9000/accept",
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify(captain)
+
+})
+
+
+.then(()=>{
+
+
+document.getElementById("msg").innerHTML =
+"✅ تم قبول الرحلة";
+
+
+});
+
+
+}
+
+
+
+
+
+function startRide(){
+
+
+fetch("http://127.0.0.1:9000/start",
+{
+method:"POST"
+})
+
+
+.then(()=>{
+
+
+document.getElementById("msg").innerHTML =
+"🚗 بدأت الرحلة";
+
+
+});
+
+
+}
+
+
+
+
+
+function finishRide(){
+
+
+fetch("http://127.0.0.1:9000/finish",
+{
+method:"POST"
+})
+
+
+.then(()=>{
+
+
+document.getElementById("msg").innerHTML =
+"🏁 انتهت الرحلة";
+
+
+});
+
+
+}
+
+
+
+
+
+setInterval(getRide,1000);
+
+setInterval(getPassengerLocation,2000);
+
+setInterval(sendCaptainLocation,3000);
+
+
+
+getRide();
+
+getPassengerLocation();
+
+sendCaptainLocation();
+
+
+
+</script>
+
+
+</body>
+
+</html>

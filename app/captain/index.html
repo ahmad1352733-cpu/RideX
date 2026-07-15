@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>RideX Captain</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0066cc;
+padding:20px;
+text-align:center;
+}
+
+.card{
+background:white;
+border-radius:20px;
+padding:25px;
+}
+
+.ride{
+background:#eee;
+border-radius:15px;
+padding:15px;
+margin:15px;
+font-size:20px;
+}
+
+button{
+background:#0066cc;
+color:white;
+border:0;
+padding:15px;
+border-radius:12px;
+font-size:20px;
+width:90%;
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="card">
+
+<h1>🚗 RideX Captain</h1>
+
+<h2 id="title">الرحلات المتاحة</h2>
+
+<div id="rides">
+جاري البحث...
+</div>
+
+</div>
+
+
+
+<script>
+
+
+let currentRide = null;
+
+
+
+function loadRides(){
+
+
+if(currentRide){
+return;
+}
+
+
+fetch("http://127.0.0.1:9000/rides")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+
+let box=document.getElementById("rides");
+
+box.innerHTML="";
+
+
+if(data.length == 0){
+
+box.innerHTML="لا توجد رحلات حاليا";
+
+return;
+
+}
+
+
+
+data.forEach(r=>{
+
+
+box.innerHTML += `
+
+<div class="ride">
+
+🚗 رحلة رقم: ${r[0]}
+
+<br><br>
+
+📍 من:
+<br>
+${r[3]}
+
+<br><br>
+
+🏁 إلى:
+<br>
+${r[4]}
+
+<br><br>
+
+الحالة:
+${r[5]}
+
+<br><br>
+
+<button onclick="acceptRide(${r[0]})">
+
+✅ قبول الرحلة
+
+</button>
+
+</div>
+
+`;
+
+});
+
+
+});
+
+
+}
+
+
+
+
+
+function acceptRide(id){
+
+
+currentRide=id;
+
+
+fetch("http://127.0.0.1:9000/accept",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+ride_id:id,
+
+phone:
+localStorage.getItem("captainPhone") || "000"
+
+})
+
+});
+
+
+
+showControls();
+
+
+}
+
+
+
+
+
+function showControls(){
+
+
+document.getElementById("title").innerHTML =
+"رحلتي الحالية";
+
+
+
+document.getElementById("rides").innerHTML = `
+
+
+<div class="ride">
+
+🚗 الرحلة رقم:
+${currentRide}
+
+<br><br>
+
+<button onclick="startRide()">
+
+▶️ بدء الرحلة
+
+</button>
+
+
+<button onclick="finishRide()">
+
+🏁 إنهاء الرحلة
+
+</button>
+
+
+</div>
+
+
+`;
+
+}
+
+
+
+
+
+function startRide(){
+
+
+fetch("http://127.0.0.1:9000/start",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+ride_id:currentRide
+
+})
+
+});
+
+
+alert("تم بدء الرحلة");
+
+}
+
+
+
+
+function finishRide(){
+
+
+fetch("http://127.0.0.1:9000/finish",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+ride_id:currentRide
+
+})
+
+});
+
+
+alert("تم إنهاء الرحلة");
+
+
+currentRide=null;
+
+loadRides();
+
+}
+
+
+
+
+setInterval(loadRides,3000);
+
+loadRides();
+
+
+</script>
+
+
+</body>
+
+</html>

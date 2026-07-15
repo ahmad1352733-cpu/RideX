@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>RideX متابعة الرحلة</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#0066cc;
+text-align:center;
+padding:20px;
+}
+
+
+.card{
+background:white;
+border-radius:20px;
+padding:25px;
+}
+
+
+.info{
+background:#eee;
+padding:15px;
+margin:10px;
+border-radius:15px;
+font-size:20px;
+}
+
+
+#map{
+height:350px;
+border-radius:20px;
+margin-top:20px;
+}
+
+
+h1{
+color:#0066cc;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+<h1>🚗 RideX</h1>
+
+
+<h2 id="status">
+🟡 جاري تحميل الرحلة
+</h2>
+
+
+<div class="info">
+
+👤 الكابتن:
+<br>
+
+<span id="name">-</span>
+
+</div>
+
+
+
+<div class="info">
+
+🚘 السيارة:
+<br>
+
+<span id="car">-</span>
+
+</div>
+
+
+
+<div class="info">
+
+📞 الهاتف:
+<br>
+
+<span id="phone">-</span>
+
+</div>
+
+
+
+<div id="map"></div>
+
+
+</div>
+
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+
+<script>
+
+
+let map = L.map('map').setView(
+[31.9539,35.9106],
+13
+);
+
+
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+maxZoom:19
+}
+).addTo(map);
+
+
+
+let captainMarker;
+
+
+
+function checkRide(){
+
+
+fetch("http://127.0.0.1:9000/ride")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+
+let c=data.captain || {};
+
+
+document.getElementById("name").innerHTML =
+c.name || "-";
+
+
+document.getElementById("car").innerHTML =
+c.car || "-";
+
+
+document.getElementById("phone").innerHTML =
+c.phone || "-";
+
+
+
+let status =
+document.getElementById("status");
+
+
+
+if(data.status==="accepted"){
+
+status.innerHTML =
+"🚗 الكابتن في الطريق إليك";
+
+}
+
+
+
+else if(data.status==="started"){
+
+status.innerHTML =
+"🛣️ الرحلة بدأت";
+
+}
+
+
+
+else if(data.status==="finished"){
+
+status.innerHTML =
+"✅ وصلت إلى وجهتك";
+
+}
+
+
+
+if(data.captain_location){
+
+let lat=data.captain_location.lat;
+
+let lng=data.captain_location.lng;
+
+
+if(lat && lng){
+
+
+if(captainMarker){
+
+captainMarker.setLatLng(
+[lat,lng]
+);
+
+
+}else{
+
+
+captainMarker=L.marker(
+[lat,lng]
+)
+.addTo(map)
+.bindPopup("🚗 الكابتن");
+
+
+}
+
+
+map.setView(
+[lat,lng],
+15
+);
+
+
+}
+
+
+}
+
+
+
+});
+
+
+}
+
+
+
+setInterval(checkRide,1000);
+
+checkRide();
+
+
+</script>
+
+
+</body>
+
+</html>
