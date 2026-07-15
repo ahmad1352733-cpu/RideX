@@ -77,7 +77,7 @@ return;
 }
 
 
-fetch("http://127.0.0.1:9000/rides")
+fetch("https://ridex-kdj1.onrender.com/rides")
 
 .then(res=>res.json())
 
@@ -155,7 +155,7 @@ function acceptRide(id){
 currentRide=id;
 
 
-fetch("http://127.0.0.1:9000/accept",
+fetch("https://ridex-kdj1.onrender.com/accept",
 {
 
 method:"POST",
@@ -232,7 +232,7 @@ ${currentRide}
 function startRide(){
 
 
-fetch("http://127.0.0.1:9000/start",
+fetch("https://ridex-kdj1.onrender.com/start",
 {
 
 method:"POST",
@@ -260,7 +260,7 @@ alert("تم بدء الرحلة");
 function finishRide(){
 
 
-fetch("http://127.0.0.1:9000/finish",
+fetch("https://ridex-kdj1.onrender.com/finish",
 {
 
 method:"POST",

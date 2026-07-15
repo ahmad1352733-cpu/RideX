@@ -142,7 +142,7 @@ let lng=position.coords.longitude;
 
 
 
-fetch("http://127.0.0.1:9000/location",
+fetch("https://ridex-kdj1.onrender.com/location",
 {
 
 method:"POST",
@@ -237,7 +237,7 @@ return;
 
 
 
-fetch("http://127.0.0.1:9000/request",
+fetch("https://ridex-kdj1.onrender.com/request",
 {
 
 method:"POST",
@@ -286,7 +286,7 @@ if(!waiting)return;
 
 
 
-fetch("http://127.0.0.1:9000/ride")
+fetch("https://ridex-kdj1.onrender.com/ride")
 
 .then(res=>res.json())
 
