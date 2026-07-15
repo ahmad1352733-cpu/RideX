@@ -539,6 +539,7 @@ alert("انتهت الرحلة");
 currentRide=null;
 
 setTimeout(function(){ map.invalidateSize(); },1000);
+setTimeout(function(){ map.invalidateSize(); },1500);
 loadRides();
 
 
@@ -554,6 +555,7 @@ setInterval(sendCaptainLocation,10000);
 
 
 setTimeout(function(){ map.invalidateSize(); },1000);
+setTimeout(function(){ map.invalidateSize(); },1500);
 loadRides();
 
 sendCaptainLocation();
