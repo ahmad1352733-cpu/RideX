@@ -176,9 +176,14 @@ class Handler(BaseHTTPRequestHandler):
 
             ride["to"] = data["to"]
 
-            ride["passenger_phone"] = data.get(
-                "phone",
+            ride["passenger_name"] = data.get(
+                "passenger_name",
                 ""
+            )
+
+            ride["passenger_phone"] = data.get(
+                "passenger_phone",
+                data.get("phone","")
             )
 
             ride["status"] = "waiting"
