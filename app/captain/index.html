@@ -4,42 +4,83 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>RIDEB Captain</title>
 
 <style>
 
-body{
-font-family:Arial;
-background:#0066cc;
-padding:20px;
-text-align:center;
+*{
+box-sizing:border-box;
 }
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f5f7fb;
+padding:20px;
+}
+
 
 .card{
 background:white;
-border-radius:20px;
+border-radius:30px;
 padding:25px;
+box-shadow:0 10px 30px #0002;
+text-align:center;
 }
+
+
+.logo{
+
+font-size:35px;
+font-weight:bold;
+color:#1565c0;
+
+}
+
 
 .ride{
-background:#eee;
-border-radius:15px;
-padding:15px;
-margin:15px;
-font-size:20px;
+
+background:#f1f5f9;
+border-radius:20px;
+padding:20px;
+margin:15px 0;
+font-size:18px;
+
 }
 
+
 button{
-background:#0066cc;
+
+background:#1565c0;
 color:white;
+
 border:0;
-padding:15px;
-border-radius:12px;
+
+padding:16px;
+
+border-radius:15px;
+
 font-size:20px;
+
 width:90%;
+
 margin-top:10px;
+
 }
+
+
+.status{
+
+background:#eef5ff;
+padding:15px;
+border-radius:15px;
+color:#1565c0;
+font-weight:bold;
+
+}
+
 
 </style>
 
@@ -48,15 +89,26 @@ margin-top:10px;
 
 <body>
 
+
 <div class="card">
 
-<h1>🚗 RIDEB Captain</h1>
 
-<h2 id="title">الرحلات المتاحة</h2>
+<div class="logo">
+🚗 RIDEB Captain
+</div>
+
+
+<h2 id="title">
+الرحلات المتاحة
+</h2>
+
 
 <div id="rides">
+
 جاري البحث...
+
 </div>
+
 
 </div>
 
@@ -65,7 +117,7 @@ margin-top:10px;
 <script>
 
 
-let currentRide = null;
+let currentRide=null;
 
 
 
@@ -75,6 +127,7 @@ function loadRides(){
 if(currentRide){
 return;
 }
+
 
 
 fetch("https://ridex-kdj1.onrender.com/rides")
@@ -89,7 +142,7 @@ let box=document.getElementById("rides");
 box.innerHTML="";
 
 
-if(data.length == 0){
+if(data.length==0){
 
 box.innerHTML="لا توجد رحلات حاليا";
 
@@ -102,11 +155,12 @@ return;
 data.forEach(r=>{
 
 
-box.innerHTML += `
+box.innerHTML+=`
 
 <div class="ride">
 
-🚗 رحلة رقم: ${r[0]}
+🚗 رحلة رقم:
+${r[0]}
 
 <br><br>
 
@@ -127,11 +181,13 @@ ${r[5]}
 
 <br><br>
 
+
 <button onclick="acceptRide(${r[0]})">
 
 ✅ قبول الرحلة
 
 </button>
+
 
 </div>
 
@@ -144,6 +200,7 @@ ${r[5]}
 
 
 }
+
 
 
 
@@ -176,7 +233,6 @@ localStorage.getItem("captainPhone") || "000"
 });
 
 
-
 showControls();
 
 
@@ -186,23 +242,25 @@ showControls();
 
 
 
+
 function showControls(){
 
 
-document.getElementById("title").innerHTML =
+document.getElementById("title").innerHTML=
 "رحلتي الحالية";
 
 
-
-document.getElementById("rides").innerHTML = `
-
+document.getElementById("rides").innerHTML=`
 
 <div class="ride">
 
-🚗 الرحلة رقم:
-${currentRide}
 
-<br><br>
+<div class="status">
+
+🚗 الرحلة رقم ${currentRide}
+
+</div>
+
 
 <button onclick="startRide()">
 
@@ -219,7 +277,6 @@ ${currentRide}
 
 
 </div>
-
 
 `;
 
@@ -252,7 +309,10 @@ ride_id:currentRide
 
 alert("تم بدء الرحلة");
 
+
 }
+
+
 
 
 
@@ -285,14 +345,75 @@ currentRide=null;
 
 loadRides();
 
+
 }
+
+
+
+
+
+
+// إرسال موقع الكابتن
+
+function sendCaptainLocation(){
+
+
+navigator.geolocation.getCurrentPosition(
+
+function(position){
+
+
+let lat=position.coords.latitude;
+
+let lng=position.coords.longitude;
+
+
+
+fetch("https://ridex-kdj1.onrender.com/captain_location",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+lat:lat,
+
+lng:lng,
+
+phone:
+localStorage.getItem("captainPhone") || "000"
+
+})
+
+});
+
+
+}
+
+);
+
+
+}
+
 
 
 
 
 setInterval(loadRides,3000);
 
+
+setInterval(sendCaptainLocation,3000);
+
+
 loadRides();
+
+
+sendCaptainLocation();
+
 
 
 </script>
