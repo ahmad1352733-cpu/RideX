@@ -229,6 +229,7 @@ maxZoom:19
 let captainMarker;
 let myLat=31.9539;
 let myLng=35.9106;
+let firstLocation=true;
 
 
 
@@ -319,8 +320,9 @@ captainMarker=L.marker([lat,lng])
 }
 
 
-if(!captainMarker){
+if(firstLocation){
 map.setView([lat,lng],15);
+firstLocation=false;
 }
 
 
