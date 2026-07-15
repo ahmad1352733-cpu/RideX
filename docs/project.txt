@@ -1,4 +1,4 @@
-RideX Project
+RIDEB Project
 Version: MVP
 Country: Jordan
 

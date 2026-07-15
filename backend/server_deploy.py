@@ -295,7 +295,7 @@ server = HTTPServer(
 
 
 
-print("RideX Backend Running on 9000")
+print("RIDEB Backend Running on 9000")
 
 
 server.serve_forever()

@@ -39,4 +39,4 @@ CREATE TABLE IF NOT EXISTS rides(
 db.commit()
 db.close()
 
-print("RideX Database Created Successfully")
+print("RIDEB Database Created Successfully")

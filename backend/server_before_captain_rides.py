@@ -1,14 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 
-from db_helper import (
-    add_captain,
-    add_passenger,
-    add_ride,
-    get_waiting_rides,
-    accept_ride,
-    update_ride_status
-)
+from db_helper import add_captain, add_passenger, add_ride
 
 
 ride = {
@@ -62,18 +55,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
 
         self.send_response(200)
-
         self.send_cors()
-
         self.end_headers()
 
 
 
     def do_GET(self):
 
-
         if self.path == "/ride":
-
 
             self.send_response(200)
 
@@ -85,45 +74,14 @@ class Handler(BaseHTTPRequestHandler):
             self.send_cors()
 
             self.end_headers()
-
 
             self.wfile.write(
                 json.dumps(ride).encode()
             )
 
-            return
-
-
-
-        if self.path == "/rides":
-
-
-            self.send_response(200)
-
-            self.send_header(
-                "Content-Type",
-                "application/json"
-            )
-
-            self.send_cors()
-
-            self.end_headers()
-
-
-            self.wfile.write(
-                json.dumps(
-                    get_waiting_rides()
-                ).encode()
-            )
-
-            return
-
-
-
 
 
     def do_POST(self):
-
 
         global ride
 
@@ -183,6 +141,8 @@ class Handler(BaseHTTPRequestHandler):
 
             ride["status"] = "waiting"
 
+            ride["captain"] = {}
+
 
             add_ride(
 
@@ -198,16 +158,25 @@ class Handler(BaseHTTPRequestHandler):
 
 
 
+        elif self.path == "/location":
+
+
+            ride["passenger_location"] = data
+
+
+
+
+
+        elif self.path == "/captain_location":
+
+
+            ride["captain_location"] = data
+
+
+
+
+
         elif self.path == "/accept":
-
-
-            accept_ride(
-
-                data["ride_id"],
-
-                data["phone"]
-
-            )
 
 
             ride["status"] = "accepted"
@@ -221,17 +190,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/start":
 
 
-            update_ride_status(
-
-                data["ride_id"],
-
-                "started"
-
-            )
-
-
             ride["status"] = "started"
-
 
 
 
@@ -240,36 +199,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/finish":
 
 
-            update_ride_status(
-
-                data["ride_id"],
-
-                "finished"
-
-            )
-
-
             ride["status"] = "finished"
-
-
-
-
-
-
-        elif self.path == "/location":
-
-
-            ride["passenger_location"] = data
-
-
-
-
-
-
-        elif self.path == "/captain_location":
-
-
-            ride["captain_location"] = data
 
 
 

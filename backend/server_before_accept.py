@@ -5,9 +5,7 @@ from db_helper import (
     add_captain,
     add_passenger,
     add_ride,
-    get_waiting_rides,
-    accept_ride,
-    update_ride_status
+    get_waiting_rides
 )
 
 
@@ -121,7 +119,6 @@ class Handler(BaseHTTPRequestHandler):
 
 
 
-
     def do_POST(self):
 
 
@@ -154,7 +151,6 @@ class Handler(BaseHTTPRequestHandler):
 
 
 
-
         elif self.path == "/register_passenger":
 
 
@@ -165,7 +161,6 @@ class Handler(BaseHTTPRequestHandler):
                 data["password"]
 
             )
-
 
 
 
@@ -183,6 +178,8 @@ class Handler(BaseHTTPRequestHandler):
 
             ride["status"] = "waiting"
 
+            ride["captain"] = {}
+
 
             add_ride(
 
@@ -196,73 +193,10 @@ class Handler(BaseHTTPRequestHandler):
 
 
 
-
-
-        elif self.path == "/accept":
-
-
-            accept_ride(
-
-                data["ride_id"],
-
-                data["phone"]
-
-            )
-
-
-            ride["status"] = "accepted"
-
-            ride["captain"] = data
-
-
-
-
-
-        elif self.path == "/start":
-
-
-            update_ride_status(
-
-                data["ride_id"],
-
-                "started"
-
-            )
-
-
-            ride["status"] = "started"
-
-
-
-
-
-
-        elif self.path == "/finish":
-
-
-            update_ride_status(
-
-                data["ride_id"],
-
-                "finished"
-
-            )
-
-
-            ride["status"] = "finished"
-
-
-
-
-
-
         elif self.path == "/location":
 
 
             ride["passenger_location"] = data
-
-
-
 
 
 
@@ -271,6 +205,28 @@ class Handler(BaseHTTPRequestHandler):
 
             ride["captain_location"] = data
 
+
+
+        elif self.path == "/accept":
+
+
+            ride["status"] = "accepted"
+
+            ride["captain"] = data
+
+
+
+        elif self.path == "/start":
+
+
+            ride["status"] = "started"
+
+
+
+        elif self.path == "/finish":
+
+
+            ride["status"] = "finished"
 
 
 
@@ -286,13 +242,9 @@ class Handler(BaseHTTPRequestHandler):
 
 
 server = HTTPServer(
-
     ("0.0.0.0",9000),
-
     Handler
-
 )
-
 
 
 print("RIDEB Backend Running on 9000")
