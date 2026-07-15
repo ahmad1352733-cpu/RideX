@@ -33,7 +33,7 @@ left:0;
 
 width:100%;
 
-height:67vh;
+height:100vh;
 
 z-index:1;
 
@@ -217,6 +217,7 @@ let map=L.map('map').setView(
 
 
 
+setTimeout(function(){ map.invalidateSize(); },500);
 L.tileLayer(
 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
