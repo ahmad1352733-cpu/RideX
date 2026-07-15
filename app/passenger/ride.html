@@ -193,4 +193,177 @@ font-weight:bold;
 
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+
+let waiting = false;
+let userMarker;
+
+
+let map = L.map('map').setView(
+[31.9539,35.9106],
+13
+);
+
+
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+maxZoom:19
+}
+).addTo(map);
+
+
+
+function sendPassengerLocation(){
+
+navigator.geolocation.getCurrentPosition(
+
+function(position){
+
+let lat = position.coords.latitude;
+let lng = position.coords.longitude;
+
+
+fetch("https://ridex-kdj1.onrender.com/location",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+lat:lat,
+lng:lng
+})
+});
+
+
+
+if(userMarker){
+
+userMarker.setLatLng([lat,lng]);
+
+}else{
+
+userMarker = L.marker([lat,lng])
+.addTo(map)
+.bindPopup("📍 موقعك");
+
+}
+
+
+map.setView([lat,lng],15);
+
+
+
+if(document.getElementById("from").value===""){
+
+document.getElementById("from").value =
+lat+","+lng;
+
+}
+
+
+}
+
+);
+
+}
+
+
+
+
+function sendRide(){
+
+let from =
+document.getElementById("from").value.trim();
+
+let to =
+document.getElementById("to").value.trim();
+
+
+
+if(from==="" || to===""){
+
+document.getElementById("status").innerHTML =
+"⚠️ أدخل مكان الانطلاق والوجهة";
+
+return;
+
+}
+
+
+
+fetch("https://ridex-kdj1.onrender.com/request",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+from:from,
+to:to
+
+})
+
+})
+
+
+.then(()=>{
+
+waiting=true;
+
+document.getElementById("status").innerHTML =
+"🟡 جاري البحث عن كابتن...";
+
+});
+
+
+}
+
+
+
+
+function checkRide(){
+
+if(!waiting)return;
+
+
+fetch("https://ridex-kdj1.onrender.com/ride")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+
+if(data.status==="accepted"){
+
+window.location.href="driver.html";
+
+}
+
+
+});
+
+
+}
+
+
+
+setInterval(sendPassengerLocation,3000);
+
+setInterval(checkRide,1000);
+
+
+sendPassengerLocation();
+
+
+</script>
+
+
+</body>
+</html>
