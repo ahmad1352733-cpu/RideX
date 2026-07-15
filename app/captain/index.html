@@ -325,7 +325,7 @@ captainMarker=L.marker([lat,lng])
 
 
 if(firstLocation){
-map.setView([lat,lng],15);
+if(firstLocation){map.setView([lat,lng],15);firstLocation=false;}
 firstLocation=false;
 }
 
@@ -542,8 +542,6 @@ alert("انتهت الرحلة");
 
 currentRide=null;
 
-setTimeout(function(){ map.invalidateSize(); },1000);
-setTimeout(function(){ map.invalidateSize(); },1500);
 loadRides();
 
 
@@ -558,8 +556,6 @@ setInterval(loadRides,3000);
 setInterval(sendCaptainLocation,10000);
 
 
-setTimeout(function(){ map.invalidateSize(); },1000);
-setTimeout(function(){ map.invalidateSize(); },1500);
 loadRides();
 
 sendCaptainLocation();
