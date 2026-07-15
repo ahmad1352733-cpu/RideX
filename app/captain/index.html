@@ -319,7 +319,9 @@ captainMarker=L.marker([lat,lng])
 }
 
 
+if(!captainMarker){
 map.setView([lat,lng],15);
+}
 
 
 }
@@ -546,7 +548,7 @@ loadRides();
 
 setInterval(loadRides,3000);
 
-setInterval(sendCaptainLocation,3000);
+setInterval(sendCaptainLocation,10000);
 
 
 setTimeout(function(){ map.invalidateSize(); },1000);
