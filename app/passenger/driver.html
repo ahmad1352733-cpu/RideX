@@ -4,49 +4,123 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>RIDEB متابعة الرحلة</title>
+<title>RIDEB - متابعة الرحلة</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 
-
 <style>
+
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
-font-family:Arial;
-background:#0066cc;
-text-align:center;
-padding:20px;
+font-family:Arial,sans-serif;
+background:#f5f7fb;
+overflow:hidden;
 }
 
 
-.card{
-background:white;
-border-radius:20px;
-padding:25px;
-}
-
-
-.info{
-background:#eee;
-padding:15px;
-margin:10px;
-border-radius:15px;
-font-size:20px;
-}
-
+/* الخريطة */
 
 #map{
-height:350px;
-border-radius:20px;
-margin-top:20px;
+
+position:absolute;
+top:0;
+left:0;
+
+width:100%;
+
+height:60vh;
+
+z-index:1;
+
 }
 
 
-h1{
-color:#0066cc;
+
+/* البطاقة */
+
+.card{
+
+position:absolute;
+
+bottom:0;
+
+left:0;
+
+width:100%;
+
+background:white;
+
+border-radius:35px 35px 0 0;
+
+padding:25px;
+
+z-index:10;
+
+box-shadow:0 -5px 25px #0003;
+
 }
+
+
+
+/* الشعار */
+
+.logo{
+
+font-size:36px;
+
+font-weight:bold;
+
+color:#1565c0;
+
+}
+
+
+
+/* الحالة */
+
+.status{
+
+background:#eef5ff;
+
+padding:15px;
+
+border-radius:15px;
+
+margin:15px 0;
+
+font-size:20px;
+
+font-weight:bold;
+
+color:#1565c0;
+
+}
+
+
+
+/* المعلومات */
+
+.info{
+
+background:#f8fafc;
+
+padding:15px;
+
+border-radius:18px;
+
+margin-top:10px;
+
+font-size:18px;
+
+}
+
+
 
 </style>
 
@@ -56,20 +130,34 @@ color:#0066cc;
 <body>
 
 
+<div id="map"></div>
+
+
+
 <div class="card">
 
 
-<h1>🚗 RIDEB</h1>
+<div class="logo">
+
+🚗 RIDEB
+
+</div>
 
 
-<h2 id="status">
+
+<div class="status" id="status">
+
 🟡 جاري تحميل الرحلة
-</h2>
+
+</div>
+
+
 
 
 <div class="info">
 
-👤 الكابتن:
+👤 الكابتن
+
 <br>
 
 <span id="name">-</span>
@@ -80,7 +168,8 @@ color:#0066cc;
 
 <div class="info">
 
-🚘 السيارة:
+🚘 السيارة
+
 <br>
 
 <span id="car">-</span>
@@ -91,7 +180,8 @@ color:#0066cc;
 
 <div class="info">
 
-📞 الهاتف:
+📞 الهاتف
+
 <br>
 
 <span id="phone">-</span>
@@ -100,15 +190,13 @@ color:#0066cc;
 
 
 
-<div id="map"></div>
-
-
 </div>
 
 
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 
 <script>
@@ -118,6 +206,7 @@ let map = L.map('map').setView(
 [31.9539,35.9106],
 13
 );
+
 
 
 L.tileLayer(
@@ -146,6 +235,7 @@ fetch("https://ridex-kdj1.onrender.com/ride")
 let c=data.captain || {};
 
 
+
 document.getElementById("name").innerHTML =
 c.name || "-";
 
@@ -172,14 +262,12 @@ status.innerHTML =
 }
 
 
-
 else if(data.status==="started"){
 
 status.innerHTML =
 "🛣️ الرحلة بدأت";
 
 }
-
 
 
 else if(data.status==="finished"){
@@ -191,11 +279,15 @@ status.innerHTML =
 
 
 
+
+
 if(data.captain_location){
+
 
 let lat=data.captain_location.lat;
 
 let lng=data.captain_location.lng;
+
 
 
 if(lat && lng){
@@ -203,9 +295,11 @@ if(lat && lng){
 
 if(captainMarker){
 
+
 captainMarker.setLatLng(
 [lat,lng]
 );
+
 
 
 }else{
@@ -214,11 +308,14 @@ captainMarker.setLatLng(
 captainMarker=L.marker(
 [lat,lng]
 )
+
 .addTo(map)
+
 .bindPopup("🚗 الكابتن");
 
 
 }
+
 
 
 map.setView(
@@ -242,6 +339,7 @@ map.setView(
 
 
 setInterval(checkRide,1000);
+
 
 checkRide();
 
