@@ -219,9 +219,10 @@ let map=L.map('map').setView(
 
 setTimeout(function(){ map.invalidateSize(); },500);
 L.tileLayer(
-'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
-maxZoom:19
+maxZoom:17,
+ detectRetina:true
 }
 ).addTo(map);
 
