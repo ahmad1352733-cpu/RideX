@@ -7,8 +7,7 @@ from db_helper import (
     add_ride,
     get_waiting_rides,
     accept_ride,
-    update_ride_status,
-    finish_ride_payment
+    update_ride_status
 )
 
 
@@ -177,14 +176,9 @@ class Handler(BaseHTTPRequestHandler):
 
             ride["to"] = data["to"]
 
-            ride["passenger_name"] = data.get(
-                "passenger_name",
-                ""
-            )
-
             ride["passenger_phone"] = data.get(
-                "passenger_phone",
-                data.get("phone","")
+                "phone",
+                ""
             )
 
             ride["status"] = "waiting"
@@ -251,12 +245,6 @@ class Handler(BaseHTTPRequestHandler):
                 data["ride_id"],
 
                 "finished"
-
-            )
-
-            finish_ride_payment(
-
-                data["ride_id"]
 
             )
 

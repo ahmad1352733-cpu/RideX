@@ -165,3 +165,44 @@ def update_ride_status(ride_id, status):
     conn.commit()
 
     conn.close()
+
+
+def finish_ride_payment(ride_id):
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT price, captain_phone
+    FROM rides
+    WHERE id=?
+    """,(ride_id,))
+
+    ride = cur.fetchone()
+
+    if not ride:
+        conn.close()
+        return
+
+    price = ride[0]
+    captain_phone = ride[1]
+
+    commission = price * 0.10
+
+    cur.execute("""
+    UPDATE rides
+    SET commission=?
+    WHERE id=?
+    """,(commission, ride_id))
+
+
+    cur.execute("""
+    UPDATE captains
+    SET wallet = wallet - ?
+    WHERE phone=?
+    """,(commission, captain_phone))
+
+
+    conn.commit()
+    conn.close()
+
