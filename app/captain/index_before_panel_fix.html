@@ -8,8 +8,6 @@
 
 <title>RIDEB Captain</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-
 <style>
 
 *{
@@ -18,10 +16,9 @@ box-sizing:border-box;
 
 body{
 margin:0;
-font-family:Arial;
-background:#f5f7fb;
-height:100vh;
+font-family:Arial,sans-serif;
 overflow:hidden;
+background:#f5f7fb;
 }
 
 
@@ -30,10 +27,12 @@ overflow:hidden;
 #map{
 
 position:absolute;
+
 top:0;
 left:0;
 
 width:100%;
+
 height:100vh;
 
 z-index:1;
@@ -41,13 +40,15 @@ z-index:1;
 }
 
 
-/* الصندوق السفلي */
 
-.card{
+/* المربع السفلي */
+
+.panel{
 
 position:absolute;
 
 bottom:0;
+
 left:0;
 
 width:100%;
@@ -62,16 +63,24 @@ z-index:10;
 
 box-shadow:0 -5px 25px #0003;
 
+height:33vh;
+
+overflow:auto;
+
 }
+
 
 
 .logo{
 
 font-size:32px;
+
 font-weight:bold;
+
 color:#1565c0;
 
 }
+
 
 
 .status{
@@ -80,7 +89,7 @@ margin-top:15px;
 
 padding:15px;
 
-border-radius:18px;
+border-radius:20px;
 
 background:#eef5ff;
 
@@ -91,11 +100,12 @@ font-weight:bold;
 }
 
 
+
 button{
 
 width:100%;
 
-padding:17px;
+padding:16px;
 
 margin-top:12px;
 
@@ -103,15 +113,16 @@ border:0;
 
 border-radius:18px;
 
-background:#1565c0;
-
-color:white;
-
 font-size:20px;
 
 font-weight:bold;
 
+background:#1565c0;
+
+color:white;
+
 }
+
 
 
 .ride{
@@ -128,6 +139,7 @@ font-size:18px;
 
 }
 
+
 </style>
 
 </head>
@@ -139,31 +151,44 @@ font-size:18px;
 <div id="map"></div>
 
 
-<div class="card">
+
+<div class="panel">
 
 
 <div class="logo">
+
 🚗 RIDEB Captain
+
 </div>
 
 
 <div class="status" id="onlineStatus">
+
 🟢 متاح
+
 </div>
 
 
-<button onclick="toggleStatus()">
+<button onclick="toggleStatus()" id="statusBtn">
+
 تغيير الحالة
+
 </button>
 
 
-<h3>
-الرحلات
+
+<h3 id="title">
+
+الرحلات المتاحة
+
 </h3>
 
 
+
 <div id="rides">
+
 جاري البحث...
+
 </div>
 
 
@@ -172,18 +197,20 @@ font-size:18px;
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-
 <script>
 
-let available=true;
+
 let currentRide=null;
-let marker=null;
+
+let available=true;
+
 
 
 let map=L.map('map').setView(
 [31.9539,35.9106],
 13
 );
+
 
 
 L.tileLayer(
@@ -195,42 +222,68 @@ maxZoom:19
 
 
 
+let captainMarker;
+
+
+
+
 function toggleStatus(){
+
 
 available=!available;
 
-document.getElementById("onlineStatus").innerHTML =
-available ? "🟢 متاح" : "⚪ غير متاح";
+
+
+let box=document.getElementById("onlineStatus");
+
+
+if(available){
+
+box.innerHTML="🟢 متاح";
+
+}else{
+
+box.innerHTML="⚪ غير متاح";
+
+}
+
 
 }
 
 
 
-function sendLocation(){
 
-if(!available)
-return;
+function sendCaptainLocation(){
+
+
+if(!available)return;
+
 
 
 navigator.geolocation.getCurrentPosition(
 
-p=>{
+function(position){
 
 
-let lat=p.coords.latitude;
-let lng=p.coords.longitude;
+let lat=position.coords.latitude;
+
+let lng=position.coords.longitude;
 
 
-fetch(
-"https://ridex-kdj1.onrender.com/captain_location",
+
+fetch("https://ridex-kdj1.onrender.com/captain_location",
 {
+
 method:"POST",
+
 headers:{
 "Content-Type":"application/json"
 },
+
 body:JSON.stringify({
 
 lat:lat,
+
 lng:lng,
 
 phone:
@@ -238,45 +291,51 @@ localStorage.getItem("captainPhone") || "000"
 
 })
 
-}
-);
-
-
-
-if(marker){
-
-marker.setLatLng([lat,lng]);
-
-}else{
-
-marker=L.marker([lat,lng])
-.addTo(map)
-.bindPopup("🚗 أنت");
-
-map.setView([lat,lng],15);
-
-}
-
-
 });
 
 
+
+if(captainMarker){
+
+captainMarker.setLatLng([lat,lng]);
+
+}else{
+
+captainMarker=L.marker([lat,lng])
+
+.addTo(map)
+
+.bindPopup("🚗 أنت");
+
 }
+
+
+map.setView([lat,lng],15);
+
+
+}
+
+);
+
+
+}
+
+
+
+
 
 
 
 function loadRides(){
 
 
-if(currentRide)
-return;
+if(currentRide || !available)return;
 
 
-fetch(
-"https://ridex-kdj1.onrender.com/rides"
-)
 
-.then(r=>r.json())
+fetch("https://ridex-kdj1.onrender.com/rides")
+
+.then(res=>res.json())
 
 .then(data=>{
 
@@ -286,9 +345,10 @@ let box=document.getElementById("rides");
 box.innerHTML="";
 
 
+
 if(data.length==0){
 
-box.innerHTML="لا توجد رحلات";
+box.innerHTML="لا توجد رحلات حاليا";
 
 return;
 
@@ -303,20 +363,24 @@ box.innerHTML+=`
 
 <div class="ride">
 
-🚕 رحلة رقم ${r[0]}
+🚗 رحلة رقم ${r[0]}
 
 <br><br>
 
-📍 ${r[3]}
-
+📍 من:
 <br>
+${r[3]}
 
-🏁 ${r[4]}
+<br><br>
+
+🏁 إلى:
+<br>
+${r[4]}
 
 
 <button onclick="acceptRide(${r[0]})">
 
-قبول الرحلة
+✅ قبول
 
 </button>
 
@@ -335,14 +399,17 @@ box.innerHTML+=`
 
 
 
+
+
+
 function acceptRide(id){
 
 
 currentRide=id;
 
 
-fetch(
-"https://ridex-kdj1.onrender.com/accept",
+
+fetch("https://ridex-kdj1.onrender.com/accept",
 {
 
 method:"POST",
@@ -360,30 +427,32 @@ localStorage.getItem("captainPhone") || "000"
 
 })
 
-}
-);
+});
 
 
-document.getElementById("rides").innerHTML=
 
-`
+document.getElementById("title").innerHTML=
+"رحلتي الحالية";
+
+
+document.getElementById("rides").innerHTML=`
 
 <div class="ride">
 
-✅ تم قبول الرحلة
-
-<br><br>
-
-رقم الرحلة: ${id}
+🚗 الرحلة رقم ${id}
 
 
 <button onclick="startRide()">
-بدء الرحلة
+
+▶️ بدء الرحلة
+
 </button>
 
 
 <button onclick="finishRide()">
-إنهاء الرحلة
+
+🏁 إنهاء الرحلة
+
 </button>
 
 
@@ -391,16 +460,20 @@ document.getElementById("rides").innerHTML=
 
 `;
 
+
+
 }
+
+
+
+
 
 
 
 function startRide(){
 
-navigator.geolocation.getCurrentPosition(function(position){
 
-fetch(
-"https://ridex-kdj1.onrender.com/start",
+fetch("https://ridex-kdj1.onrender.com/start",
 {
 
 method:"POST",
@@ -411,28 +484,25 @@ headers:{
 
 body:JSON.stringify({
 
-ride_id:currentRide,
-lat:position.coords.latitude,
-lng:position.coords.longitude
+ride_id:currentRide
 
 })
 
-}
-);
-
 });
 
+
+alert("بدأت الرحلة");
+
+
 }
+
 
 
 
 function finishRide(){
 
 
-navigator.geolocation.getCurrentPosition(function(position){
-
-fetch(
-"https://ridex-kdj1.onrender.com/finish",
+fetch("https://ridex-kdj1.onrender.com/finish",
 {
 
 method:"POST",
@@ -443,34 +513,36 @@ headers:{
 
 body:JSON.stringify({
 
-ride_id:currentRide,
-lat:position.coords.latitude,
-lng:position.coords.longitude
+ride_id:currentRide
 
 })
 
-}
-);
-
 });
+
+
+alert("انتهت الرحلة");
 
 
 currentRide=null;
 
 loadRides();
 
+
 }
+
+
 
 
 
 setInterval(loadRides,3000);
 
-setInterval(sendLocation,10000);
+setInterval(sendCaptainLocation,3000);
 
 
 loadRides();
 
-sendLocation();
+sendCaptainLocation();
+
 
 
 </script>

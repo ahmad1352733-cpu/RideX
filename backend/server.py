@@ -1,5 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+import math
+from datetime import datetime
 
 from db_helper import (
     add_captain,
@@ -8,7 +10,9 @@ from db_helper import (
     get_waiting_rides,
     accept_ride,
     update_ride_status,
-    finish_ride_payment
+    finish_ride_payment,
+    save_start_location,
+    save_end_location
 )
 
 
@@ -36,6 +40,38 @@ ride = {
 
 }
 
+
+
+
+
+def calculate_price(distance_km, minutes):
+
+    price = 1.0
+
+    if distance_km > 2:
+        price += (distance_km - 2) * 0.25
+
+    price += minutes * 0.02
+
+    return round(price,2)
+
+
+
+def distance_km(lat1,lng1,lat2,lng2):
+
+    R = 6371
+
+    dlat = math.radians(lat2-lat1)
+    dlng = math.radians(lng2-lng1)
+
+    a = (
+        math.sin(dlat/2)**2 +
+        math.cos(math.radians(lat1)) *
+        math.cos(math.radians(lat2)) *
+        math.sin(dlng/2)**2
+    )
+
+    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -235,6 +271,14 @@ class Handler(BaseHTTPRequestHandler):
 
             )
 
+            save_start_location(
+
+                data["ride_id"],
+                data.get("lat",0),
+                data.get("lng",0)
+
+            )
+
 
             ride["status"] = "started"
 
@@ -251,6 +295,14 @@ class Handler(BaseHTTPRequestHandler):
                 data["ride_id"],
 
                 "finished"
+
+            )
+
+            save_end_location(
+
+                data["ride_id"],
+                data.get("lat",0),
+                data.get("lng",0)
 
             )
 

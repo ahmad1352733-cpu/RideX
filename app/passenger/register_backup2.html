@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+<title>RIDEB Passenger Register</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#0066cc;
+text-align:center;
+padding:30px;
+}
+
+.card{
+background:white;
+border-radius:20px;
+padding:30px;
+}
+
+input{
+width:90%;
+padding:18px;
+margin:10px;
+font-size:22px;
+border-radius:12px;
+border:1px solid #ccc;
+}
+
+button{
+width:90%;
+padding:20px;
+font-size:25px;
+border:none;
+border-radius:15px;
+background:#0066cc;
+color:white;
+}
+
+#msg{
+font-size:22px;
+margin-top:20px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+<h1>🚗 RIDEB</h1>
+
+<h2>تسجيل راكب</h2>
+
+
+<input id="name" placeholder="اسم الراكب">
+
+
+<input id="phone" placeholder="رقم الهاتف">
+
+
+<input id="password" type="password" placeholder="كلمة المرور">
+
+
+<label>
+
+<input id="agree" type="checkbox">
+
+أوافق على شروط استخدام RIDEB
+
+</label>
+
+
+<br><br>
+
+
+<button onclick="registerPassenger()">
+تسجيل
+</button>
+
+
+<h3 id="msg"></h3>
+
+
+</div>
+
+
+
+<script>
+
+
+function registerPassenger(){
+
+
+let name =
+document.getElementById("name").value.trim();
+
+
+let phone =
+document.getElementById("phone").value.trim();
+
+
+let password =
+document.getElementById("password").value.trim();
+
+
+let agree =
+document.getElementById("agree").checked;
+
+
+
+if(
+name=="" ||
+phone=="" ||
+password==""
+){
+
+localStorage.setItem("passengerName", name);
+localStorage.setItem("passengerPhone", phone);
+document.getElementById("msg").innerHTML=
+"⚠️ أكمل البيانات";
+
+return;
+
+}
+
+
+if(!agree){
+
+localStorage.setItem("passengerName", name);
+localStorage.setItem("passengerPhone", phone);
+document.getElementById("msg").innerHTML=
+"⚠️ وافق على الشروط";
+
+return;
+
+}
+
+
+
+fetch("http://127.0.0.1:9000/register_passenger",
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+name:name,
+
+phone:phone,
+
+password:password
+
+})
+
+})
+
+
+.then(()=>{
+
+
+localStorage.setItem("passengerName", name);
+localStorage.setItem("passengerPhone", phone);
+document.getElementById("msg").innerHTML=
+"✅ تم تسجيل الراكب";
+
+
+})
+
+.catch(()=>{
+
+
+localStorage.setItem("passengerName", name);
+localStorage.setItem("passengerPhone", phone);
+document.getElementById("msg").innerHTML=
+"❌ خطأ في الاتصال";
+
+
+});
+
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

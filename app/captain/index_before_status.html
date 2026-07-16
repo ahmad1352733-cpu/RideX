@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RIDEB Captain</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f5f7fb;
+padding:20px;
+}
+
+
+.card{
+background:white;
+border-radius:30px;
+padding:25px;
+box-shadow:0 10px 30px #0002;
+text-align:center;
+}
+
+
+.logo{
+
+font-size:35px;
+font-weight:bold;
+color:#1565c0;
+
+}
+
+
+.ride{
+
+background:#f1f5f9;
+border-radius:20px;
+padding:20px;
+margin:15px 0;
+font-size:18px;
+
+}
+
+
+button{
+
+background:#1565c0;
+color:white;
+
+border:0;
+
+padding:16px;
+
+border-radius:15px;
+
+font-size:20px;
+
+width:90%;
+
+margin-top:10px;
+
+}
+
+
+.status{
+
+background:#eef5ff;
+padding:15px;
+border-radius:15px;
+color:#1565c0;
+font-weight:bold;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+<div class="logo">
+🚗 RIDEB Captain
+</div>
+
+
+<h2 id="title">
+الرحلات المتاحة
+</h2>
+
+
+<div id="rides">
+
+جاري البحث...
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+let currentRide=null;
+
+
+
+function loadRides(){
+
+
+if(currentRide){
+return;
+}
+
+
+
+fetch("https://ridex-kdj1.onrender.com/rides")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+
+let box=document.getElementById("rides");
+
+box.innerHTML="";
+
+
+if(data.length==0){
+
+box.innerHTML="لا توجد رحلات حاليا";
+
+return;
+
+}
+
+
+
+data.forEach(r=>{
+
+
+box.innerHTML+=`
+
+<div class="ride">
+
+🚗 رحلة رقم:
+${r[0]}
+
+<br><br>
+
+📍 من:
+<br>
+${r[3]}
+
+<br><br>
+
+🏁 إلى:
+<br>
+${r[4]}
+
+<br><br>
+
+الحالة:
+${r[5]}
+
+<br><br>
+
+
+<button onclick="acceptRide(${r[0]})">
+
+✅ قبول الرحلة
+
+</button>
+
+
+</div>
+
+`;
+
+});
+
+
+});
+
+
+}
+
+
+
+
+
+
+function acceptRide(id){
+
+
+currentRide=id;
+
+
+fetch("https://ridex-kdj1.onrender.com/accept",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+ride_id:id,
+
+phone:
+localStorage.getItem("captainPhone") || "000"
+
+})
+
+});
+
+
+showControls();
+
+
+}
+
+
+
+
+
+
+function showControls(){
+
+
+document.getElementById("title").innerHTML=
+"رحلتي الحالية";
+
+
+document.getElementById("rides").innerHTML=`
+
+<div class="ride">
+
+
+<div class="status">
+
+🚗 الرحلة رقم ${currentRide}
+
+</div>
+
+
+<button onclick="startRide()">
+
+▶️ بدء الرحلة
+
+</button>
+
+
+<button onclick="finishRide()">
+
+🏁 إنهاء الرحلة
+
+</button>
+
+
+</div>
+
+`;
+
+}
+
+
+
+
+
+function startRide(){
+
+
+fetch("https://ridex-kdj1.onrender.com/start",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+ride_id:currentRide
+
+})
+
+});
+
+
+alert("تم بدء الرحلة");
+
+
+}
+
+
+
+
+
+
+function finishRide(){
+
+
+fetch("https://ridex-kdj1.onrender.com/finish",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+ride_id:currentRide
+
+})
+
+});
+
+
+alert("تم إنهاء الرحلة");
+
+
+currentRide=null;
+
+loadRides();
+
+
+}
+
+
+
+
+
+
+// إرسال موقع الكابتن
+
+function sendCaptainLocation(){
+
+
+navigator.geolocation.getCurrentPosition(
+
+function(position){
+
+
+let lat=position.coords.latitude;
+
+let lng=position.coords.longitude;
+
+
+
+fetch("https://ridex-kdj1.onrender.com/captain_location",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+lat:lat,
+
+lng:lng,
+
+phone:
+localStorage.getItem("captainPhone") || "000"
+
+})
+
+});
+
+
+}
+
+);
+
+
+}
+
+
+
+
+
+setInterval(loadRides,3000);
+
+
+setInterval(sendCaptainLocation,3000);
+
+
+loadRides();
+
+
+sendCaptainLocation();
+
+
+
+</script>
+
+
+</body>
+
+</html>

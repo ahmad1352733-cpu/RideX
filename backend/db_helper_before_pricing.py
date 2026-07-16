@@ -167,91 +167,79 @@ def update_ride_status(ride_id, status):
     conn.close()
 
 
-
-
 def finish_ride_payment(ride_id):
 
     conn = connect()
     cur = conn.cursor()
 
     cur.execute("""
-    SELECT
-    start_lat,
-    start_lng,
-    end_lat,
-    end_lng,
-    started_at,
-    finished_at,
-    captain_phone
+    SELECT price, captain_phone
     FROM rides
     WHERE id=?
     """,(ride_id,))
 
-    ride=cur.fetchone()
+    ride = cur.fetchone()
 
     if not ride:
         conn.close()
         return
 
+    price = ride[0]
+    captain_phone = ride[1]
 
-    import math
-    from datetime import datetime
-
-
-    start_lat,start_lng,end_lat,end_lng,started,finished,captain_phone=ride
-
-
-    R=6371
-
-    dlat=math.radians(end_lat-start_lat)
-    dlng=math.radians(end_lng-start_lng)
-
-    a=(math.sin(dlat/2)**2+
-       math.cos(math.radians(start_lat))*
-       math.cos(math.radians(end_lat))*
-       math.sin(dlng/2)**2)
-
-    distance=R*2*math.atan2(math.sqrt(a),math.sqrt(1-a))
-
-
-    minutes=1
-
-    try:
-        t1=datetime.fromisoformat(started)
-        t2=datetime.fromisoformat(finished)
-        minutes=max(1,int((t2-t1).total_seconds()/60))
-    except:
-        pass
-
-
-    price=1
-
-    if distance>2:
-        price+=(distance-2)*0.25
-
-    price+=minutes*0.02
-
-    price=round(price,2)
-
-    commission=round(price*0.10,2)
-
+    commission = price * 0.10
 
     cur.execute("""
     UPDATE rides
-    SET price=?,
-        commission=?
+    SET commission=?
     WHERE id=?
-    """,
-    (price,commission,ride_id))
+    """,(commission, ride_id))
 
 
     cur.execute("""
     UPDATE captains
-    SET wallet=wallet-?
+    SET wallet = wallet - ?
     WHERE phone=?
-    """,
-    (commission,captain_phone))
+    """,(commission, captain_phone))
 
+
+    conn.commit()
+    conn.close()
+
+
+
+def save_start_location(ride_id, lat, lng):
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("""
+    UPDATE rides
+    SET start_lat=?,
+        start_lng=?,
+        started_at=CURRENT_TIMESTAMP
+    WHERE id=?
+    """,
+    (lat,lng,ride_id))
+
+    conn.commit()
+    conn.close()
+
+
+
+def save_end_location(ride_id, lat, lng):
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("""
+    UPDATE rides
+    SET end_lat=?,
+        end_lng=?,
+        finished_at=CURRENT_TIMESTAMP
+    WHERE id=?
+    """,
+    (lat,lng,ride_id))
 
     conn.commit()
     conn.close()
