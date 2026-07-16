@@ -1,6 +1,8 @@
 {
+  "id": "/RideX/",
   "name": "RIDEB",
   "short_name": "RIDEB",
+  "description": "RIDEB - Smart ride hailing application",
   "start_url": "/RideX/app/passenger/index.html",
   "display": "standalone",
   "background_color": "#1565C0",
